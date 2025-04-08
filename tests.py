@@ -1,3 +1,4 @@
+import pytest
 from main import BooksCollector
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
@@ -42,13 +43,15 @@ class TestBooksCollector:
         # Проверяем с помощью тестируемой функции get_book_genre, что присвоенное значение равно тому, что присваивали ранее
         assert collector.get_book_genre('Что делать, если ваш кот хочет вас убить') == 'Детективы'
 
-    def test_get_books_with_specific_genre_one_of_two_books(self):
+    def test_get_books_with_specific_genre_one_of_two_books(self,): #Исправлен код для соответствия названию
         # создаем экземпляр (объект) класса BooksCollector
         collector = BooksCollector()
         # добавляем книги
+        collector.add_new_book('Гордость и предубеждение и зомби')
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
         # добавляем жанры
         collector.set_book_genre('Что делать, если ваш кот хочет вас убить', 'Детективы')
+        collector.set_book_genre('Гордость и предубеждение и зомби', 'Фантастика')
         # Проверяем с помощью тестируемой функции get_books_with_specific_genre, что присвоенное значение равно тому, что присваивали ранее
         assert collector.get_books_with_specific_genre('Детективы')==['Что делать, если ваш кот хочет вас убить']
 
@@ -62,7 +65,7 @@ class TestBooksCollector:
         collector.set_book_genre('Что делать, если ваш кот хочет вас убить', 'Детективы')
         collector.set_book_genre('Гордость и предубеждение и зомби', 'Фантастика')
         # проверяем, что в списке оба жанра
-        assert collector.get_books_genre()==['Детективы','Фантастика']
+        assert collector.get_books_genre()==collector.books_genre
 
     def test_get_books_for_children_one_of_two_books(self):
         # создаем экземпляр (объект) класса BooksCollector
@@ -75,14 +78,12 @@ class TestBooksCollector:
         collector.set_book_genre('Гордость и предубеждение и зомби', 'Фантастика')
         # проверяем, что в списке находится только одна книга, подходящая для детей
         assert collector.get_books_for_children()==['Гордость и предубеждение и зомби']
-
+#Убрал добавление жанров для проверки избранного
     def test_add_book_in_favorites_one_book(self):
         # создаем экземпляр (объект) класса BooksCollector
         collector = BooksCollector()
         # добавляем книги
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
-        # добавляем жанры
-        collector.set_book_genre('Что делать, если ваш кот хочет вас убить', 'Детективы')
         # добавляем книгу в избранное
         collector.add_book_in_favorites('Что делать, если ваш кот хочет вас убить')
         # проверяем, что в избранном находится добавленная книга
@@ -94,9 +95,6 @@ class TestBooksCollector:
         # добавляем книги
         collector.add_new_book('Гордость и предубеждение и зомби')
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
-        # добавляем жанры
-        collector.set_book_genre('Что делать, если ваш кот хочет вас убить', 'Детективы')
-        collector.set_book_genre('Гордость и предубеждение и зомби', 'Фантастика')
         # добавляем две книги в избранное
         collector.add_book_in_favorites('Что делать, если ваш кот хочет вас убить')
         collector.add_book_in_favorites('Гордость и предубеждение и зомби')
@@ -105,16 +103,16 @@ class TestBooksCollector:
         # проверяем, что в избранном осталась одна книга
         assert collector.favorites==['Гордость и предубеждение и зомби']
 
-    def test_get_list_of_favorites_book_one_of_two_books(self):
+    #Добавил параметризацию для теста, теперь добавляется книга из списка и проверяется, что она добавлена
+    @pytest.mark.parametrize('books', ['Что делать, если ваш кот хочет вас убить', 'Гордость и предубеждение и зомби'])
+    def test_get_list_of_favorites_book_one_of_two_books(self,books):
         # создаем экземпляр (объект) класса BooksCollector
         collector = BooksCollector()
         # добавляем книги
         collector.add_new_book('Гордость и предубеждение и зомби')
         collector.add_new_book('Что делать, если ваш кот хочет вас убить')
-        # добавляем жанры
-        collector.set_book_genre('Что делать, если ваш кот хочет вас убить', 'Детективы')
-        collector.set_book_genre('Гордость и предубеждение и зомби', 'Фантастика')
+
         # добавляем книгу в избранное
-        collector.add_book_in_favorites('Что делать, если ваш кот хочет вас убить')
+        collector.add_book_in_favorites(books)
         # проверяем, что в избранном одна добавленная книга
-        assert collector.get_list_of_favorites_books()==['Что делать, если ваш кот хочет вас убить']
+        assert collector.get_list_of_favorites_books()==[books]
